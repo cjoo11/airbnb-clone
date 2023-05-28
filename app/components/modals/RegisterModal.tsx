@@ -15,8 +15,10 @@ import Input from "../inputs/Input";
 import { toast } from "react-hot-toast";
 import Button from "../Button";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const RegisterModal = () => {
+  const router = useRouter();
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
 
@@ -39,9 +41,17 @@ const RegisterModal = () => {
 
     axios
       .post("/api/register", data)
-      .then(() => registerModal.onClose())
+      .then(() => {
+        registerModal.onClose();
+        toast.success("Registration success!");
+        signIn("credentials", {
+          ...data,
+          redirect: false,
+        });
+        router.refresh();
+      })
       .catch(() => {
-        toast.error("Something went wrong.");
+        toast.error("Email is already in use.");
       })
       .finally(() => {
         setIsLoading(false);
