@@ -14,8 +14,8 @@ import getCurrentUser from "./actions/getCurrentUser";
 const font = Nunito({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Airbnb",
-  description: "Airbnb clone",
+  title: "Airbnb Clone",
+  description: "Personal project based on Airbnb",
 };
 
 export default async function RootLayout({

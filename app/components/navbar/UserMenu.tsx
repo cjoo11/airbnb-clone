@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { AiOutlineMenu } from "react-icons/ai";
 import Avatar from "../Avatar";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
 import MenuItem from "./MenuItem";
 
@@ -11,6 +11,7 @@ import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useRentModal from "@/app/hooks/useRentModal";
 import { SafeUser } from "@/app/types";
+import { useClickOutside } from "@/app/hooks/useClickOutside";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -21,13 +22,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  useClickOutside(userMenuRef, () => setIsOpen(false));
 
   const toggleOpen = useCallback(() => {
     setIsOpen((value) => !value);
   }, []);
 
   const onRent = useCallback(() => {
+    setIsOpen(false);
     if (!currentUser) {
       return loginModal.onOpen();
     }
@@ -36,7 +41,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   }, [currentUser, loginModal, rentModal]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={userMenuRef}>
       <div className="flex flex-row items-center gap-3">
         <div
           onClick={onRent}
@@ -56,7 +61,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       </div>
       {isOpen && (
         <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm">
-          <div className="flex flex-col cursor-pointer">
+          <div
+            className="flex flex-col cursor-pointer"
+            onClick={() => setIsOpen(false)}
+          >
             {currentUser ? (
               <>
                 <MenuItem
